@@ -110,10 +110,33 @@ void main(){
             printf("\n\n\t8)Regresar");
             printf("\n\n\t:");
             scanf("%d",&opcion_MenuB);
+                switch (opcion_MenuB){
+                case 1: 
+                llenado_Hospital(&hospital1);
+                break;
+                case 2:
+                llenado_Equipo(&equipo1);
+                break;
+                case 3: 
+                llenado_especialidad(&especialidad1, equipo1);
+                break;
+                case 4:
+                llenado_doctor(&doc1, &especialidad1);
+                break;
+                case 5: 
+                llenado_paciente(&paciente1, &hospital1, &doc1, &especialidad1);
+                break;
+                case 6:
+                llenado_trabajador(&trabajador1);
+                break;
+                case 7: 
+                llenado_intendencia(&intendencia1);
+                break;
+                }
             }while(opcion_MenuB!=8);
             break;
             case 2:
-            do{
+            do{//Este menu desplegara las opciones para visualizar los datos de las estructuras.
             printf("\n\n\t usted a elegido la opcion de visualizar datos, se le va a desplegar un menu de las opciones a ejecutar");
             printf("\n\n\t ---MENU---");
             printf("\n\n\t1)Hospital");
@@ -126,6 +149,50 @@ void main(){
             printf("\n\n\t8)Regresar");
             printf("\n\n\t:");
             scanf("%d",&opcion_MenuB);
+                switch(opcion_MenuB){
+                    case 1: 
+                     printf("\n\n\tLos datos del hospital son:\n\n\tNombre: %s\n\tDirección: %s", hospital1.nombre, hospital1.direccion);
+                     break;
+                     case 2:
+                     printf("\n\n\tLos datos del equipo medico son: \n\n\tNombre del equipo: %s\n\n\tMarca del equipo: %s\n\n\tModelo del equipo: %s",equipo1.nombre, equipo1.marca, equipo1.modelo);
+                     break;
+                     case 3: 
+                     printf("\n\n\tLos datos de la especialidad son: ");
+                     printf("\n\n\n Nombre: %s", especialidad1.nombre);
+                     printf("\n\n\tXCantidad de doctores",especialidad1.cantidad_MATASANOS);
+                     printf("\n\n\nCantidad de pacientes", especialidad1.cantidad_victimas);
+                     printf("\n\n\tEquipo Medico utilizado: %s", especialidad1.equipo);
+                     break;
+                     case 4:
+                     printf("\n\n\t los datos del doctor son: ");
+                     printf("\n\n\tNombre: ", doc1.nombre);
+                     printf("\n\n\tEdad del doctor: ",doc1.edad);
+                     printf("\n\n\nCantidad de pacientes: ", doc1.cantidad_pacientes);
+                     printf("\n\n\tEspecialidad del doctor: ",doc1.especialidad.nombre);
+                     break;
+                    case 5:
+                    printf("\n\n\t Los datos del paciente son: ");
+                    printf("\n\n\t Nombre: ", paciente1.nombre);
+                    printf("\n\n\tEdad del paciente: ",paciente1.edad);
+                    printf("\n\n\t Numero de paciente: ", paciente1.num_paciente);
+                    printf("\n\n\tDoctor del paciente: ", paciente1.doc);
+                    printf("\n\n\t Especialidad en la que se encuentra: ", paciente1.especial.nombre);
+                    printf("\n\n\t Hospital en el que se encuentra: ", paciente1.hospital.nombre);
+                    break;
+                    case 6: 
+                    printf("\n\n\t Los datos del trabajador son: ", trabajador1.num_trabajador);
+                    printf("\n\n\t Esta sindicalizado el trabajador: ", trabajador1.sindicalizado);
+                    break;
+                    case 7: 
+                    printf("\n\n\tDatos de la intendencia: ");
+                    printf("\n\n\t Nombre: ", intendencia1.nombre);
+                    printf("\n\n\t Edad: ", intendencia1.edad);
+                    printf("\n\n\t Numero: ", intendencia1.num_trabajador);
+                    break;
+                    case 8:
+                    printf("\n\n\t Gracias por todo");
+                    break;
+                }
             }while(opcion_MenuB!=8);
             break;
 
