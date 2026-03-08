@@ -1,1 +1,257 @@
+/*Este programa va a crear 7 estructuras que guarden datos de un hospital
+entradas: Hospital, doctores (especialidad, nombre, edad), medicamentos, pacientes, trabajadores, intendencia
+equipo medico
+salidas: agregar datos, cambiar datos
+restricciones: valores enteros unicamente*/
 
+#include <stdio.h>  
+#include <string.h>
+
+// En esta parte definimos las 7 estructuras que se van a usar a lo largo del programa.
+/* Cada estructura se hizo con una jerarquia, esto sirve para llamarlas dentro de  las otras estructuras;por ejemplo, en la estrucura de paciente se llaman a las estructuras de Hospital
+Especialidad y doctor, por lo que se tuvieron que definir antes de la estrucutra de paciente*/
+
+//Esta estructura guarda los datos del hospital; como el nombre y la dirección del mismo
+typedef struct HOSPITAL{
+    char nombre[30];
+    char direccion[40];
+}HOSPITAL;
+
+//Esta estructura guarda los datos del equipo medico del hospital , como el nombre, marca y modelo del equipo medio en uso. 
+typedef struct EQUIPO_MEDICO{
+    char nombre [30];
+    char marca[30];
+    char modelo[30];
+}EQUIPO_MEDICO;
+
+// Esta estructura guarda los datos de la especialidad de los doctores del hospital, osea, guarda la cantidad de doctores y pacientes. Ademas de guardar el equipo medico que se usa
+typedef struct ESPECIALIDAD{
+    char nombre [30];
+    int cantidad_MATASANOS;// sirve para definir la cantidad de doctores en la especialidad
+    int cantidad_victimas;// sirve para definir la cantidad de pacientes en la especialidad 
+    EQUIPO_MEDICO equipo; //Aqui se llama a la estructura anterior, por eso es importante que la definieramos antes de esta estructura.
+}ESPECIALIDAD;
+
+//Esta estructura guarda los datos de los doctores del hospital. 
+typedef struct DOCTOR{
+    char nombre[30];
+    int edad;
+    int numero_Trabajador;
+    ESPECIALIDAD especialidad;//Aqui tambien se llama a una estructura anterior. 
+    int cantidad_pacientes;
+}DOCTOR;
+
+//Aqui se guardan los datos de los pacientes, como sus nombres, edades y su número de paciente
+typedef struct PACIENTE{
+    char nombre [30];
+    int edad;
+    int num_paciente;
+    HOSPITAL hospital;//En esta parte se llaman a 3 estructuras anteriores. 
+    DOCTOR doc;      // Y algo que no mencione es que se tiene que cambiar el nombre de la estructura para poder cambiar sus datos dentro del programa,
+    ESPECIALIDAD especial;
+}PACIENTE;
+
+//Aqui se guardan los datos de los trabajadores del hospital. 
+typedef struct  TRABAJADOR{
+    int num_trabajador;
+    char sindicalizado [2];
+}TRABAJADOR;
+
+//Aqui se guardan los datos de la intendencia del hospital. 
+typedef struct INTENDENCIA{
+    char nombre [30];
+    int edad;
+    int num_trabajador;
+}INTENDENCIA;
+
+void llenado_Hospital (HOSPITAL *hospital);
+void llenado_Equipo(EQUIPO_MEDICO *equipo);
+void llenado_especialidad(ESPECIALIDAD *especialidad, EQUIPO_MEDICO equipo);
+void llenado_doctor(DOCTOR *doc, ESPECIALIDAD *especialidad);
+void llenado_paciente(PACIENTE *paciente , HOSPITAL *hospital, DOCTOR *doc, ESPECIALIDAD *especialidad);
+void llenado_trabajador(TRABAJADOR *trabajador);
+void llenado_intendencia(INTENDENCIA *intendencia);
+
+
+//En la funcion principal se le van a agregar datos a cada una de las estructuras, utilizando la metodogia down-up, se llamara a cada una de las funciones de llenado. 
+void main(){
+    HOSPITAL hospital1;
+    EQUIPO_MEDICO equipo1;
+    PACIENTE paciente1;
+    DOCTOR doc1;
+    TRABAJADOR trabajador1;
+    INTENDENCIA intendencia1;
+    ESPECIALIDAD especialidad1;
+    int opcion_MenuA;
+    int opcion_MenuB;
+
+    //Ocupamos una combinación de do-while y switch para que nos muestre los menus que vamos a usar 
+    do{
+    printf("\n\n\t Este es nuestro sistema de gestión de hopitales, elija la opcion que quiere ejecutrar");
+    printf("\n\n\t ----MENU----");
+    printf("\n\n\t1)Agregar datos");
+    printf("\n\n\t2)visualizar datos");
+    printf("\n\n\t3)salir");
+    printf("\n\n\t: ");
+    scanf("%d",&opcion_MenuA);
+        //este menu se applica si el usuario elijio la opcion de agregarle datos al sistema
+        switch(opcion_MenuA){
+            case 1: 
+            do{//Este do-while se usa en caso de que el ususario quiea regresar al menu principal y elegir otra acción
+            printf("\n\n\t usted a elegido la opcion de agregar datos, se le va a desplegar un menu de las opciones a ejecutar");
+            printf("\n\n\t ---MENU---");
+            printf("\n\n\t1)Hospital");
+            printf("\n\n\t2)Equipo medico");
+            printf("\n\n\t3)Especialidad");
+            printf("\n\n\t4)Doctor");
+            printf("\n\n\t5)Paciente");
+            printf("\n\n\t6)trabajador");
+            printf("\n\n\t7)Intendencia");
+            printf("\n\n\t8)Regresar");
+            printf("\n\n\t:");
+            scanf("%d",&opcion_MenuB);
+            }while(opcion_MenuB!=8);
+            break;
+            case 2:
+            do{
+            printf("\n\n\t usted a elegido la opcion de visualizar datos, se le va a desplegar un menu de las opciones a ejecutar");
+            printf("\n\n\t ---MENU---");
+            printf("\n\n\t1)Hospital");
+            printf("\n\n\t2)Equipo medico");
+            printf("\n\n\t3)Especialidad");
+            printf("\n\n\t4)Doctor");
+            printf("\n\n\t5)Paciente");
+            printf("\n\n\t6)trabajador");
+            printf("\n\n\t7)Intendencia");
+            printf("\n\n\t8)Regresar");
+            printf("\n\n\t:");
+            scanf("%d",&opcion_MenuB);
+            }while(opcion_MenuB!=8);
+            break;
+
+            case 3:
+            printf("\n\n\tGracias por participar :)");
+            break;           
+        }
+
+    }while(opcion_MenuA!=3);
+
+
+
+}
+
+//En esta parte se encuentran las funciones que nos ayudaran al llenado de infromacion de cada una de las estructuras. 
+void llenado_Hospital(HOSPITAL *hospital1){
+    char nombre[30];
+    char direccion[40];
+    printf("\n\n\tBuen dia, por favor ingrese el nombre del hospital: ");
+    scanf (" %s", nombre);
+    printf("\n\n\tAhora ingrese la direccion del hospital: ");
+    scanf (" %s", direccion);
+
+    strcpy(hospital1->nombre, nombre);
+    strcpy(hospital1->direccion, direccion);
+}
+
+void llenado_Equipo(EQUIPO_MEDICO *equipo1){
+    char nombre [30];
+    char marca [30];
+    char modelo [30];
+    printf("\n\n\tAhora porfavor llene los datos del equipo usado por el hospital: ");
+    printf("\n\n\tNombre del equipo: ");
+    scanf("%s", nombre);
+    printf("\n\n\tMarca del equipo: ");
+    scanf("%s", marca);  
+    printf("\n\n\tModelo del equipo: ");
+    scanf(" %s", modelo);
+
+    strcpy(equipo1->nombre, nombre);
+    strcpy(equipo1->marca, marca);
+    strcpy(equipo1->modelo, modelo);
+}
+
+void llenado_especialidad(ESPECIALIDAD *especialidad1, EQUIPO_MEDICO equipo1){
+    char nombre [30];
+    int cantidad_MATASANOS;
+    int cantidad_victimas;
+    printf("\n\n\t Especialidad");
+    scanf(" %s", nombre); 
+    printf("\n\n\tCantidad de doctores en esta especialidad: ");
+    scanf("%d", &cantidad_MATASANOS); 
+    printf("\n\n\tCantidad de paciente en esta especialidad: ");
+    scanf("%d", &cantidad_victimas);
+
+    strcpy(especialidad1->nombre, nombre);
+    especialidad1->cantidad_MATASANOS = cantidad_MATASANOS;
+    especialidad1->cantidad_victimas = cantidad_victimas;
+    especialidad1->equipo = equipo1;
+}
+
+void llenado_doctor(DOCTOR *doc1, ESPECIALIDAD *especialidad1){
+    char nombre [30];
+    int edad;
+    int numero_Trabajador;
+    int cantidad_pacientes;
+    printf("\n\n\tEscriba el nombre del doctor: ");
+    scanf( " %s", nombre);
+    printf("\n\n\tEscriba la edad del doctor: ");
+    scanf("%d", &edad);
+    printf("\n\n\tEscriba la cantidad de pacientes que atiende el doctor");
+    scanf("%d", &cantidad_pacientes);
+    printf("\n\n\tEscriba el numero de trabajador del doctor: ");
+    scanf("%d", &numero_Trabajador);
+
+    strcpy(doc1->nombre, nombre);
+    doc1->edad = edad;
+    doc1->numero_Trabajador = numero_Trabajador;
+    doc1->cantidad_pacientes = cantidad_pacientes;
+    doc1->especialidad = *especialidad1;
+}
+
+void llenado_paciente(PACIENTE *paciente1, HOSPITAL *hospital1, DOCTOR *doc1, ESPECIALIDAD *especialidad1){
+    char nombre [30];
+    int edad;
+    int num_paciente;
+    printf("\n\n\tEscriba el nombre del paciente: ");
+    scanf(" %s", nombre);
+    printf("\n\n\tEscriba la edad del paciente: ");
+    scanf("%d", &edad);
+    printf("\n\n\tEscriba el numero de paciente: ");
+    scanf("%d", &num_paciente);
+
+    strcpy(paciente1->nombre, nombre);
+    paciente1->edad = edad;
+    paciente1->num_paciente = num_paciente;
+    paciente1->hospital = *hospital1;
+    paciente1->doc = *doc1;
+    paciente1->especial = *especialidad1;
+}
+
+void llenado_trabajador(TRABAJADOR *trabajador1){
+    int num_trabajador;
+    char sindicalizado[2];
+
+    printf("\n\n\tEscriba el numero del trabajador: ");
+    scanf("%d", num_trabajador);
+    printf("\n\n\tEscriba si el trabajador esta sindicalizado o no (si/no): ");
+    scanf(" %s", sindicalizado); 
+
+    if (strcmp(sindicalizado, "si") == 0 || strcmp(sindicalizado, "SI") == 0) {
+        strcpy(trabajador1->sindicalizado, "si");
+    } else {
+        strcpy(trabajador1->sindicalizado, "no");
+    }
+}
+
+void llenado_intendencia(INTENDENCIA *intendencia1){
+    char nombre[30];
+    int edad;
+    int numero_trabajador;
+
+    printf("\n\n\t Ingrese el nombre: ");
+    scanf(" %s", nombre);
+    printf("\n\n\t Ingrese la edad: ");
+    scanf("%d",edad);
+    scanf("%d", numero_trabajador);   
+    strcpy(intendencia1->nombre, nombre);
+}
