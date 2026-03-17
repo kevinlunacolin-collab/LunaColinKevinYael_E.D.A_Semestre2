@@ -1,15 +1,18 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+// Definición de la estructura del nodo
 typedef struct Nodo {
     int dato;
     struct Nodo* siguiente;
 } Nodo;
 
+// Definición de la estructura de la cola
 typedef struct Cola {
     Nodo* frente;
     Nodo* fondo;
 } Cola;
+
 // Crear cola
 Cola* crearCola() {
     Cola* nuevaCola = (Cola*)malloc(sizeof(Cola));
@@ -35,7 +38,7 @@ void encolar(Cola* cola, int dato) {
 
 // Desencolar
 int desencolar(Cola* cola) {
-    if (isEmpty(cola)) {
+    if (cola->frente == NULL) {
         printf("La cola está vacía.\n");
         return -1; // Indicador de cola vacía
     }
@@ -53,7 +56,7 @@ int desencolar(Cola* cola) {
 
 // Front
 int front(Cola* cola) {
-    if (isEmpty(cola)) {
+    if (cola->frente == NULL) {
         printf("La cola está vacía.\n");
         return -1; // Indicador de cola vacía
     }
@@ -77,6 +80,8 @@ void destruirCola(Cola* cola) {
     limpiarCola(cola);
     free(cola);
 }
+
+// Función principal
 int main() {
     Cola* cola = crearCola();
     
@@ -93,3 +98,4 @@ int main() {
     destruirCola(cola);
     return 0;
 }
+    
