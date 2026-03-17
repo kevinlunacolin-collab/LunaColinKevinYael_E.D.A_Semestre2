@@ -1,0 +1,95 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+typedef struct Nodo {
+    int dato;
+    struct Nodo* siguiente;
+} Nodo;
+
+typedef struct Cola {
+    Nodo* frente;
+    Nodo* fondo;
+} Cola;
+// Crear cola
+Cola* crearCola() {
+    Cola* nuevaCola = (Cola*)malloc(sizeof(Cola));
+    nuevaCola->frente = NULL;
+    nuevaCola->fondo = NULL;
+    return nuevaCola;
+}
+
+// Encolar
+void encolar(Cola* cola, int dato) {
+    Nodo* nuevoNodo = (Nodo*)malloc(sizeof(Nodo));
+    nuevoNodo->dato = dato;
+    nuevoNodo->siguiente = NULL;
+
+    if (cola->fondo == NULL) {
+        cola->frente = nuevoNodo;
+        cola->fondo = nuevoNodo;
+    } else {
+        cola->fondo->siguiente = nuevoNodo;
+        cola->fondo = nuevoNodo;
+    }
+}
+
+// Desencolar
+int desencolar(Cola* cola) {
+    if (isEmpty(cola)) {
+        printf("La cola está vacía.\n");
+        return -1; // Indicador de cola vacía
+    }
+    Nodo* temp = cola->frente;
+    int dato = temp->dato;
+    cola->frente = cola->frente->siguiente;
+
+    if (cola->frente == NULL) {
+        cola->fondo = NULL;
+    }
+
+    free(temp);
+    return dato;
+}
+
+// Front
+int front(Cola* cola) {
+    if (isEmpty(cola)) {
+        printf("La cola está vacía.\n");
+        return -1; // Indicador de cola vacía
+    }
+    return cola->frente->dato;
+}
+
+// Comprobar si la cola está vacía
+int isEmpty(Cola* cola) {
+    return (cola->frente == NULL);
+}
+
+// Limpiar cola
+void limpiarCola(Cola* cola) {
+    while (!isEmpty(cola)) {
+        desencolar(cola);
+    }
+}
+
+// Destruir cola
+void destruirCola(Cola* cola) {
+    limpiarCola(cola);
+    free(cola);
+}
+int main() {
+    Cola* cola = crearCola();
+    
+    encolar(cola, 10);
+    encolar(cola, 20);
+    encolar(cola, 30);
+
+    printf("Elemento en el frente: %d\n", front(cola));
+
+    while (!isEmpty(cola)) {
+        printf("Desencolando: %d\n", desencolar(cola));
+    }
+
+    destruirCola(cola);
+    return 0;
+}
