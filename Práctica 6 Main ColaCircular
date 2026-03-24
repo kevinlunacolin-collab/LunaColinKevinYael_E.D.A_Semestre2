@@ -1,0 +1,73 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include "ColaCircular.h" // SOLO el .h
+
+void imprimir_estado(ColaCircular *c, char *t) {
+    // Estas funciones deben estar definidas en tu ColaCircular.c
+    printf("\n--- %s ---\n", t);
+    printf("Tam: %d | Cap: %d | Vacia: %s | Llena: %s\n",
+           cola_circ_tamano(c),
+           cola_circ_capacidad(c),
+           cola_circ_esta_vacia(c) ? "SI" : "NO",
+           cola_circ_esta_llena(c) ? "SI" : "NO");
+    printf("------------------------------------------\n");
+}
+
+int main(void) {
+    ColaCircular q;
+    int cap;
+
+    printf("Ingrese la capacidad de la cola circular: ");
+    if (scanf("%d", &cap) != 1 || cap <= 0) {
+        printf("Capacidad inválida.\n");
+        return 1;
+    }
+
+    if (!cola_circ_init(&q, cap)) {
+        printf("Error al inicializar la cola.\n");
+        return 1;
+    }
+
+    imprimir_estado(&q, "Estado Inicial");
+
+    /* Encolar hasta llenar */
+    for (int i = 1; i <= cap; ++i) {
+        int val = i * 10;
+        if (cola_circ_encolar(&q, val)) {
+            printf("Encolar %d: OK\n", val);
+        } else {
+            printf("Encolar %d: FALLO\n", val);
+        }
+    }
+    
+    imprimir_estado(&q, "Cola Llena");
+
+    /* Peek (frente) */
+    int f;
+    if (cola_circ_frente(&q, &f)) {
+        printf("El dato al frente es: %d\n", f);
+    }
+
+    /* Desencolar un par */
+    int x;
+    int a_desencolar = (cap > 2 ? 2 : cap);
+    for (int i = 0; i < a_desencolar; ++i) {
+        if (cola_circ_desencolar(&q, &x)) {
+            printf("Desencolado con éxito: %d\n", x);
+        }
+    }
+    
+    imprimir_estado(&q, "Tras desencolar algunos");
+
+    /* Probar circularidad: Encolar de nuevo */
+    printf("Intentando encolar 777...\n");
+    cola_circ_encolar(&q, 777);
+    
+    imprimir_estado(&q, "Final");
+
+    /* Limpieza total */
+    cola_circ_destroy(&q);
+    printf("Memoria liberada. Programa finalizado.\n");
+
+    return 0;
+}
