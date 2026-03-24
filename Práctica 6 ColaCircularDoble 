@@ -1,0 +1,105 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+typedef struct Nodo {
+    int dato;
+    struct Nodo* siguiente;
+} Nodo;
+
+typedef struct Cola {
+    Nodo* frente;
+    Nodo* fondo;
+    int tam;       // Tamaño actual
+    int capacidad; // Límite
+} Cola;
+
+// Crear cola circular
+Cola* crearCola(int cap) {
+    Cola* nuevaCola = (Cola*)malloc(sizeof(Cola));
+    nuevaCola->frente = NULL;
+    nuevaCola->fondo = NULL;
+    nuevaCola->tam = 0;
+    nuevaCola->capacidad = cap;
+    return nuevaCola;
+}
+
+int isEmpty(Cola* cola) {
+    return (cola->tam == 0);
+}
+
+int isFull(Cola* cola) {
+    return (cola->tam == cola->capacidad);
+}
+
+// Encolar Circular
+void encolar(Cola* cola, int dato) {
+    if (isFull(cola)) {
+        printf("Cola llena. No se puede encolar %d\n", dato);
+        return;
+    }
+    
+    Nodo* nuevoNodo = (Nodo*)malloc(sizeof(Nodo));
+    nuevoNodo->dato = dato;
+
+    if (isEmpty(cola)) {
+        cola->frente = nuevoNodo;
+        cola->fondo = nuevoNodo;
+        nuevoNodo->siguiente = nuevoNodo; // Se apunta a sí mismo
+    } else {
+        nuevoNodo->siguiente = cola->frente; // Cierra el círculo
+        cola->fondo->siguiente = nuevoNodo;
+        cola->fondo = nuevoNodo;
+    }
+    cola->tam++;
+}
+
+// Desencolar Circular
+int desencolar(Cola* cola) {
+    if (isEmpty(cola)) {
+        printf("La cola está vacía.\n");
+        return -1;
+    }
+
+    Nodo* temp = cola->frente;
+    int dato = temp->dato;
+
+    if (cola->tam == 1) {
+        cola->frente = NULL;
+        cola->fondo = NULL;
+    } else {
+        cola->frente = cola->frente->siguiente;
+        cola->fondo->siguiente = cola->frente; // Mantiene el círculo
+    }
+
+    free(temp);
+    cola->tam--;
+    return dato;
+}
+
+void destruirCola(Cola* cola) {
+    while (!isEmpty(cola)) {
+        desencolar(cola);
+    }
+    free(cola);
+}
+
+int main() {
+    int cap = 5;
+    int i; // Declarada fuera para evitar error de versión de C
+    Cola* cola = crearCola(cap);
+    
+    printf("--- Encolando elementos ---\n");
+    for (i = 1; i <= 6; i++) { // Intentamos meter 6 en una de 5
+        encolar(cola, i * 10);
+    }
+
+    printf("\nElemento en el frente: %d\n", (cola->frente ? cola->frente->dato : -1));
+
+    printf("\n--- Desencolando ---\n");
+    while (!isEmpty(cola)) {
+        printf("Dato: %d\n", desencolar(cola));
+    }
+
+    destruirCola(cola);
+    return 0;
+}
