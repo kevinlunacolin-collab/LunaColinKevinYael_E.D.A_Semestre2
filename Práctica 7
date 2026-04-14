@@ -1,0 +1,357 @@
+/*Este código es una actualización del códgio de la practica 3; el cual contaba con 7 esctructuras anidadas
+esto para almacenar la información de un hospital de los siguientes puntos: Hospital, Equipo Médico, Especialidad, Doctor, Paciente, Trabajador y Intendencia. 
+la actualización que se le hara al código, sera convertirlas estructuras en listas ligadas para manipular la información de una manera mas eficiente*/
+#include <stdio.h>
+#include <stdlib.h>
+#include <conio.h> // Necesario para _getch() y para poder usar el sistema de menús con las flechas del teclado
+#include <string.h> // para cadenas de caracteres y para usar la función de strcmp() en el caso de los trabajadores sindicalizados o no sindicalizados
+/*Aqui volvemos a introducir las estructuras, pero ahora la actualizacion sera en listas ligadas, 
+agregando apuntadores  que nos permitan enlazar los elementos*/
+typedef struct HOSPITAL{
+    char nombre[30];
+    char direccion[40];
+    struct HOSPITAL *siguiente;
+}HOSPITAL;
+
+//Esta estructura guarda los datos del equipo medico del hospital , como el nombre, marca y modelo del equipo medio en uso. 
+typedef struct EQUIPO_MEDICO{
+    char nombre [30];
+    char marca[30];
+    char modelo[30];
+    struct EQUIPO_MEDICO *siguiente;
+}EQUIPO_MEDICO;
+
+// Esta estructura guarda los datos de la especialidad de los doctores del hospital, osea, guarda la cantidad de doctores y pacientes. Ademas de guardar el equipo medico que se usa
+typedef struct ESPECIALIDAD{
+    char nombre [30];
+    int cantidad_MATASANOS;// sirve para definir la cantidad de doctores en la especialidad
+    int cantidad_victimas;// sirve para definir la cantidad de pacientes en la especialidad 
+   struct ESPECIALIDAD *siguiente;
+    struct EQUIPO_MEDICO *REFsiguiente; // Apuntador para enlazar las especialidades con los equipos médicos
+}ESPECIALIDAD;
+
+//Esta estructura guarda los datos de los doctores del hospital. 
+typedef struct DOCTOR{
+    char nombre[30];
+    int edad;
+    int numero_Trabajador;
+    int cantidad_pacientes;
+    struct DOCTOR *siguiente;
+    struct ESPECIALIDAD *REFsiguiente; // Apuntador para enlazar los doctores con las especialidades
+}DOCTOR;
+
+//Aqui se guardan los datos de los pacientes, como sus nombres, edades y su número de paciente
+typedef struct PACIENTE{
+    char nombre [30];
+    int edad;
+    int num_paciente;
+    struct PACIENTE *siguiente;
+    struct HOSPITAL *REFsiguiente_hospital; // Apuntador para enlazar los pacientes con los hospitales
+    struct DOCTOR *REFsiguiente_doctor; // Apuntador para enlazar los pacientes
+    struct ESPECIALIDAD *REFsiguiente; // Apuntador para enlazar los pacientes con las especialidades
+}PACIENTE;
+
+//Aqui se guardan los datos de los trabajadores del hospital. 
+typedef struct  TRABAJADOR{
+    int num_trabajador;
+    char sindicalizado [2];
+    struct TRABAJADOR *siguiente;
+}TRABAJADOR;
+
+//Aqui se guardan los datos de la intendencia del hospital. 
+typedef struct INTENDENCIA{
+    char nombre [30];
+    int edad;
+    int num_trabajador;
+    struct INTENDENCIA *siguiente;
+}INTENDENCIA;
+
+/*como se pudo notar, se han agregado apuntadores a cada estructura para poder crear la lista ligada circular, el siguiente paso es agrega la cabecera de la lista
+esta nos permitira acceder a los elementos de la lista para visualizar y manipularlos */
+typedef struct { 
+    HOSPITAL *head; 
+    int tam;
+     } L_HOSP;
+//Esta es la estructura para el hospital, se le agrega el nodo head para poder acceder a los elementos de la lista
+typedef struct { 
+    EQUIPO_MEDICO *head; 
+    int tam;
+     } L_EQUIPO;
+//Esta es la estructura para el equipo medico, se le agrega el nodo head para poder acceder a los elementos de la lista
+typedef struct { 
+    ESPECIALIDAD *head; 
+    int tam;
+     } L_ESPE;
+//Estructura para la lista de la especialidad
+typedef struct { 
+    DOCTOR *head; 
+    int tam;
+     } L_DOC;
+//Estructura para la lista de los doctores 
+typedef struct { 
+    PACIENTE *head; 
+    int tam;
+     } L_PAC;
+//Estructura para la lista de los pacientes
+typedef struct { 
+    TRABAJADOR *head; 
+    int tam; 
+    } L_TRAB;
+//Estructura para la lista de los trabajadores
+typedef struct { 
+    INTENDENCIA *head;
+     int tam; 
+    } L_INTE;
+    //Estructura para la lista de la intendencia
+/*Estas estructuras funcionan de la siguiente forma: se les agrega el nodo head para poder acceder a los elementos de la lista, recordemos que la lista circular 
+se implementa con un apuntador al primer nodo y un contador del número de elementos */
+// Ya en esta parte se agregan las funciones para llenar y visualizar  cada una de las estructuras, estas funciones se encargaran de pedir los datos al usuario y asignarlos a cada uno de los campos de las estructuras.
+// seguimos la metodología down-up, es decir, primero se crean las funciones para llenar cada una de las estructuras y luego se crean las funciones para visualizar cada una de las estructuras, esto con el fin de que el programa sea más organizado y fácil de entender.
+void add_hosp(L_HOSP *L);
+void add_equipo(L_EQUIPO *L);
+void add_espe(L_ESPE *L);
+void add_doc(L_DOC *L);
+void add_pac(L_PAC *L);
+void add_trab(L_TRAB *L);
+void add_inte(L_INTE *L);
+void mostrar_hosp(L_HOSP *L);
+void mostrar_equipo(L_EQUIPO *L);
+void mostrar_espe(L_ESPE *L);
+void mostrar_doc(L_DOC *L);
+void mostrar_pac(L_PAC *L);
+void mostrar_trab(L_TRAB *L);
+void mostrar_inte(L_INTE *L);
+void inicializar_L_HOSP(L_HOSP *lista);
+void inicializar_L_EQUIPO(L_EQUIPO *lista);
+void inicializar_L_ESPE(L_ESPE *lista);
+void inicializar_L_DOC(L_DOC *lista);
+void inicializar_L_PAC(L_PAC *lista);
+void inicializar_L_TRAB(L_TRAB *lista);
+void inicializar_L_INTE(L_INTE *lista);
+void limpiar();
+//Antes del manin se agregan las funciones de inicialización para cada una de las listas, estas funciones se encargaran de asignar el valor NULL al nodo head y el valor 0 al contador de elementos, esto con el fin de que la lista esté vacía al inicio del programa.
+
+//Nuestra función principal se encargara de mostrar el menú principal y llamar a las funciones de llenado y visualización de cada una de las estructuras, dependiendo de la opción que el usuario elija.
+int main() {
+    
+    L_HOSP LH; L_EQUIPO LE; L_ESPE LES; 
+    L_DOC LD; L_PAC LP; L_TRAB LT; L_INTE LI;
+
+    inicializar_L_HOSP(&LH); inicializar_L_EQUIPO(&LE);
+    inicializar_L_ESPE(&LES); inicializar_L_DOC(&LD);
+    inicializar_L_PAC(&LP); inicializar_L_TRAB(&LT);
+    inicializar_L_INTE(&LI);
+
+    int opc, sub;
+
+    do {
+        limpiar(); // Esta función se encarga de limpiar la pantalla cada vez que se muestre el menú, esto con el fin de que el programa sea más amigable para el usuario.
+        printf("\n\t--- SISTEMA HOSPITALARIO (LISTAS CIRCULARES) ---");
+        printf("\n1. Registrar Datos (Altas)");
+        printf("\n2. Visualizar Datos (Listas)");
+        printf("\n3. Salir");
+        printf("\nSeleccion: "); scanf("%d", &opc);
+
+        switch(opc) {
+            case 1: // SUBMENÚ PARA ALTAS
+                limpiar();
+                 printf("\nSelecciona la entidad a registrar:");
+                printf("\n--- ALTAS ---\n1. Hospital\n2. Equipo\n3. Especialidad\n4. Doctor\n5. Paciente\n6. Trabajador\n7. Intendencia\nOpcion: ");
+                scanf("%d", &sub);
+                if(sub == 1) add_hosp(&LH);
+                if(sub == 2) add_equipo(&LE);
+                if(sub == 3) add_espe(&LES);
+                if(sub == 4) add_doc(&LD);
+                if(sub == 5) add_pac(&LP);
+                if(sub == 6) add_trab(&LT);
+                if(sub == 7) add_inte(&LI);
+                break;
+
+            case 2: // SUBMENÚ PARA VISUALIZAR
+                limpiar();
+                 printf("\nSelecciona la entidad a visualizar:");
+                printf("\n--- CONSULTAS ---\n1. Hospitales\n2. Equipos\n3. Especialidades\n4. Doctores\n5. Pacientes\n6. Trabajadores\n7. Intendencia\nOpcion: ");
+                scanf("%d", &sub);
+                if(sub == 1) mostrar_hosp(&LH);
+                if(sub == 2) mostrar_equipo(&LE);
+                if(sub == 3) mostrar_espe(&LES);
+                if(sub == 4) mostrar_doc(&LD);
+                if(sub == 5) mostrar_pac(&LP);
+                if(sub == 6) mostrar_trab(&LT);
+                if(sub == 7) mostrar_inte(&LI);
+                printf("\nPresiona cualquier tecla para continuar...");
+                getch();
+                break;
+        }
+    } while(opc != 3);
+
+    printf("\nCerrando sistema... ¡Buen dia!\n");
+    return 0;
+}
+
+//Lo siguiente es agregar las funciones para vizualizar y manipular los datos de las listas, pero primero las funciones que nos permiten inicializar la lista. 
+//Recordemos que para esto se necesita una función de inicialización para cada lista, esta función se encargara de asignar el valor NULL al nodo head y el valor 0 al contador de elementos.
+void inicializar_L_HOSP(L_HOSP *lista){
+    lista->head = NULL;
+    lista->tam = 0;
+}
+//Función de inicialización para la lista de hospitales
+void inicializar_L_EQUIPO(L_EQUIPO *lista){
+    lista->head = NULL;
+    lista->tam = 0;
+}
+//Función de inicialización para la lista de equipos médicos
+void inicializar_L_ESPE(L_ESPE *lista){
+    lista->head = NULL;
+    lista->tam = 0;
+}
+//Función de inicialización para la lista de especialidades
+void inicializar_L_DOC(L_DOC *lista){
+    lista->head = NULL;
+    lista->tam = 0;
+}
+//Función de incialización para la lista de doctores
+void inicializar_L_PAC(L_PAC *lista){
+    lista->head = NULL;
+    lista->tam = 0;
+}
+//Función de inicialización para la lista de pacientes
+void inicializar_L_TRAB(L_TRAB *lista){
+    lista->head = NULL;
+    lista->tam = 0;
+}
+//Función de inicialización para la lista de trabajadores
+void inicializar_L_INTE(L_INTE *lista){
+    lista->head = NULL;
+    lista->tam = 0;
+}
+//Función de inicialización para la lista de intendencia
+
+/*Ya en esta parte se agregan las funciones para llenar y visualizar  cada una de las estructuras,
+ estas funciones se encargaran de pedir los datos al usuario y asignarlos a cada uno de los campos de las estructuras.*/
+void add_hosp(L_HOSP *L) {
+    HOSPITAL *n = (HOSPITAL*)malloc(sizeof(HOSPITAL));
+    printf("Nombre: "); scanf("%s", n->nombre);
+    printf("Dir: "); scanf("%s", n->direccion);
+    if (!L->head) { L->head = n; n->siguiente = n; }
+    else { HOSPITAL *a = L->head; while(a->siguiente != L->head) a = a->siguiente; a->siguiente = n; n->siguiente = L->head; }
+    L->tam++;
+}
+void add_equipo(L_EQUIPO *L) {
+    EQUIPO_MEDICO *n = (EQUIPO_MEDICO*)malloc(sizeof(EQUIPO_MEDICO));
+    printf("Nombre: "); scanf("%s", n->nombre);
+    printf("Marca: "); scanf("%s", n->marca);
+    printf("Modelo: "); scanf("%s", n->modelo);
+    if (!L->head) { L->head = n; n->siguiente = n; }
+    else { EQUIPO_MEDICO *a = L->head; while(a->siguiente != L->head) a = a->siguiente; a->siguiente = n; n->siguiente = L->head; }
+    L->tam++;
+}
+void add_espe(L_ESPE *L) {
+    ESPECIALIDAD *n = (ESPECIALIDAD*)malloc(sizeof(ESPECIALIDAD));
+    printf("Nombre: "); scanf("%s", n->nombre);
+    printf("Cant. Doc: "); scanf("%d", &n->cantidad_MATASANOS);
+    printf("Cant. Pac: "); scanf("%d", &n->cantidad_victimas);
+    if (!L->head) { L->head = n; n->siguiente = n; }
+    else { ESPECIALIDAD *a = L->head; while(a->siguiente != L->head) a = a->siguiente; a->siguiente = n; n->siguiente = L->head; }
+    L->tam++;
+}
+void add_doc(L_DOC *L) {
+    DOCTOR *n = (DOCTOR*)malloc(sizeof(DOCTOR));
+    printf("Nombre: "); scanf("%s", n->nombre);
+    printf("Edad: "); scanf("%d", &n->edad);
+    printf("Num Trab: "); scanf("%d", &n->numero_Trabajador);
+    printf("Cant. Pac: "); scanf("%d", &n->cantidad_pacientes);
+    if (!L->head) { L->head = n; n->siguiente = n; }
+    else { DOCTOR *a = L->head; while(a->siguiente != L->head) a = a->siguiente; a->siguiente = n; n->siguiente = L->head; }
+    L->tam++;
+}
+void add_pac(L_PAC *L) {
+    PACIENTE *n = (PACIENTE*)malloc(sizeof(PACIENTE));
+    printf("Nombre: "); scanf("%s", n->nombre);
+    printf("Edad: "); scanf("%d", &n->edad);
+    printf("Num Pac: "); scanf("%d", &n->num_paciente);
+    if (!L->head) { L->head = n; n->siguiente = n; }
+    else { PACIENTE *a = L->head; while(a->siguiente != L->head) a = a->siguiente; a->siguiente = n; n->siguiente = L->head; }
+    L->tam++;
+}
+void add_trab(L_TRAB *L) {
+    TRABAJADOR *n = (TRABAJADOR*)malloc(sizeof(TRABAJADOR));
+    printf("Num Trab: "); scanf("%d", &n->num_trabajador);
+    printf("Sindicalizado (si/no): "); scanf("%s", n->sindicalizado);
+    if (!L->head) { L->head = n; n->siguiente = n; }
+    else { TRABAJADOR *a = L->head; while(a->siguiente != L->head) a = a->siguiente; a->siguiente = n; n->siguiente = L->head; }
+    L->tam++;
+}
+void add_inte(L_INTE *L) {
+    INTENDENCIA *n = (INTENDENCIA*)malloc(sizeof(INTENDENCIA));
+    printf("Nombre: "); scanf("%s", n->nombre);
+    printf("Edad: "); scanf("%d", &n->edad);
+    printf("Num Trab: "); scanf("%d", &n->num_trabajador);
+    if (!L->head) { L->head = n; n->siguiente = n; }
+    else { INTENDENCIA *a = L->head; while(a->siguiente != L->head) a = a->siguiente; a->siguiente = n; n->siguiente = L->head; }
+    L->tam++;
+}
+
+void mostrar_hosp(L_HOSP *L) {
+    if (!L->head) { printf("No hay hospitales.\n"); return; }
+    HOSPITAL *a = L->head;
+    do {
+        printf("Nombre: %s, Dir: %s\n", a->nombre, a->direccion);
+        a = a->siguiente;
+    } while(a != L->head);
+}
+void mostrar_equipo(L_EQUIPO *L) {
+    if (!L->head) { printf("No hay equipos médicos.\n"); return; }
+    EQUIPO_MEDICO *a = L->head;
+    do {
+        printf("Nombre: %s, Marca: %s, Modelo: %s\n", a->nombre, a->marca, a->modelo);
+        a = a->siguiente;
+    } while(a != L->head);
+}
+void mostrar_espe(L_ESPE *L) {
+    if (!L->head) { printf("No hay especialidades.\n"); return; }
+    ESPECIALIDAD *a = L->head;
+    do {
+        printf("Nombre: %s, Cant. Doc: %d, Cant. Pac: %d\n", a->nombre, a->cantidad_MATASANOS, a->cantidad_victimas);
+        a = a->siguiente;
+    } while(a != L->head);
+}
+void mostrar_doc(L_DOC *L) {
+    if (!L->head) { printf("No hay doctores.\n"); return; }
+    DOCTOR *a = L->head;
+    do {
+        printf("Nombre: %s, Edad: %d, Num Trab: %d, Cant. Pac: %d\n", a->nombre, a->edad, a->numero_Trabajador, a->cantidad_pacientes);
+        a = a->siguiente;
+    } while(a != L->head);
+}
+void mostrar_pac(L_PAC *L) {
+    if (!L->head) { printf("No hay pacientes.\n"); return; }
+    PACIENTE *a = L->head;
+    do {
+        printf("Nombre: %s, Edad: %d, Num Pac: %d\n", a->nombre, a->edad, a->num_paciente);
+        a = a->siguiente;
+    } while(a != L->head);
+}
+void mostrar_trab(L_TRAB *L) {
+    if (!L->head) { printf("No hay trabajadores.\n"); return; }
+    TRABAJADOR *a = L->head;
+    do {
+        printf("Num Trab: %d, Sindicalizado: %s\n", a->num_trabajador, a->sindicalizado);
+        a = a->siguiente;
+    } while(a != L->head);
+}
+void mostrar_inte(L_INTE *L) {
+    if (!L->head) { printf("No hay intendencia.\n"); return; }
+    INTENDENCIA *a = L->head;
+    do {
+        printf("Nombre: %s, Edad: %d, Num Trab: %d\n", a->nombre, a->edad, a->num_trabajador);
+        a = a->siguiente;
+    } while(a != L->head);
+}
+void limpiar() {
+    #ifdef _WIN32
+        system("cls");
+    #else
+        system("clear");
+    #endif
+} //y esta ultima es para poder limpiar la pantalla cada vez que se muestre el menú, esto con el fin de que el programa sea más amigable para el usuario.
